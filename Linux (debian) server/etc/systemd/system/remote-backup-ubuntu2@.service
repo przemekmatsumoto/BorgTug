@@ -1,0 +1,12 @@
+[Unit]
+Description=Serve Remote Borg Backup - ubuntu2
+After=network-online.target remote-backup-ubuntu2.socket
+Requires=remote-backup-ubuntu2.socket
+
+[Service]
+ExecStart=/usr/bin/borg serve --append-only --restrict-to-path /mnt/backup/ubuntu_two
+Type=simple
+User=remote-backup
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal

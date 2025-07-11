@@ -1,0 +1,9 @@
+[Unit]
+Description=Backup job for %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=remote-backup
+ExecStart=/home/remote-backup/backup/run_backup.sh %i
