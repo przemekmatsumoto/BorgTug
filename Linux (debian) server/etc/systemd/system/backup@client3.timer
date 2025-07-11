@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily backup for client3
+
+[Timer]
+OnCalendar=*-*-* 22:54:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
