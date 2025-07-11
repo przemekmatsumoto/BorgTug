@@ -112,11 +112,11 @@ E5435GDSGIOSDF90345DSGOJSGD34DGSF
 pass init paste_your_copied_string
 
 10. Create a password for the borg repository located on the backup server:
-pass insert repositories/borg/ubuntu1
+pass insert repozytoria/borg/ubuntu1
 
 11. Remove keygen.conf:
 rm -f ~/keygen.conf
 
 (OPTIONAL)
 12. Check if it works:
-/opt/bin/pass show repositories/borg/nas_synology
+/opt/bin/pass show repozytoria/borg/nas_synology
