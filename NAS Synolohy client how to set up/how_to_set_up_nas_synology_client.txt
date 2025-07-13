@@ -1,51 +1,55 @@
-SECTION 1:
+SECTION 1 - Enable necessary options
 
-1. Enable SSH connection on port 22 on your NAS
+    1. Enable SSH connection on port 22 on your NAS
 
-2. Enable the option that adds home directories for users:
-Control panel -> Users and groups -> Advanced -> Enable user home folder service
+    2. Enable the option that adds home directories for users:
+    Control panel -> Users and groups -> Advanced -> Enable user home folder service
 
-SECTION 2:
+SECTION 2 - Install Entware
 
-1. Connect to your Synology NAS server:
-ssh admin@nas_ip_address
+    1. Connect to your Synology NAS server:
+    ssh root@nas_ip_address
 
-2. Create directory for Entware:
-mkdir -p /volume1/@entware
+    2. Create directory for Entware:
+    mkdir -p /volume1/@entware
 
-3. Switch directory:
-cd /volume1/@entware
+    3. Switch directory:
+    cd /volume1/@entware
 
-4. Check your processor architecture:
-uname -m
+    4. Check your processor architecture:
+    uname -m
 
-5. Depending on your processor architecture (
-    aarch64
-    armv7l
-    x86_64
-) go to "https://bin.entware.net/" and choose the correct path (for x86_64 it will be "https://bin.entware.net/x64-k3.2/installer/generic.sh" for example)
+    5. Depending on your processor architecture (
+        aarch64
+        armv7l
+        x86_64
+    ) go to "https://bin.entware.net/" and choose the correct path (for x86_64 it will be "https://bin.entware.net/x64-k3.2/installer/generic.sh" for example)
 
-6. Download the correct generic.sh file from step 5:
-wget http://bin.entware.net/YOUR_PROCESSOR_ARCHITECTURE/installer/generic.sh
+    6. Download the correct generic.sh file from step 5:
+    wget http://bin.entware.net/YOUR_PROCESSOR_ARCHITECTURE/installer/generic.sh
 
-7. After download, set correct permissions:
-chmod +x generic.sh
+    7. After download, set correct permissions:
+    chmod +x generic.sh
 
-8. Run the script:
-./generic.sh
+    8. Run the script:
+    ./generic.sh
 
-{
+    9. Test if it works:
+    sudo /opt/bin/opkg update
+
+{ Nano editor
     Install nano editor if you want (you can use vim of course ^^)
 
     1. Install nano
     /opt/bin/opkg install nano
-    (if it doesn't work, then use "sudo /opt/bin/opkg install nano") 
+    (if it doesn't work, use "sudo /opt/bin/opkg install nano") 
 }
-{
+
+{ Entware access after reboot
     After NAS restart, /opt will be cleared so Entware won't work after reboot. If you want it to run on every reboot, follow these steps:
 
     1. Edit the script: 
-    sudo nano /usr/local/etc/rc.d/entware-start.sh
+    sudo /opt/bin/nano /usr/local/etc/rc.d/entware-start.sh
     
     2. Add to the script:
     #!/bin/sh
@@ -61,194 +65,165 @@ chmod +x generic.sh
     sudo chmod +x /usr/local/etc/rc.d/entware-start.sh
 }
 
-9. Test if it works:
-/opt/bin/opkg update 
-
 SECTION 3 - Install socat and borgbackup:
 
-1. Update Entware repositories: 
-sudo opkg update
+    1. Update Entware repositories: 
+    sudo /opt/bin/opkg update
 
-2. Use Entware to install socat and borgbackup:
-sudo opkg install borgbackup socat
+    2. Use Entware to install socat and borgbackup:
+    sudo /opt/bin/opkg install borgbackup socat
 
-SECTION 4 - Add borg user and backup group:
+SECTION 4 - Add borg user:
 
-1. Add borg user with password and disable DSM access (change your_password to your own value):
-sudo synouser --add borg your_password "Borg Backup" 0 "" ""
+    1. Add borg user with password and disable DSM access (change your_password to your own value):
+    sudo synouser --add borg your_password "Borg Backup" 0 "" ""
 
-2. Change default shell for borg user. Create a script to change this after every reboot. As root:
-sudo /opt/bin/nano /usr/local/etc/rc.d/set-borg-shell.sh
+    2. Change default shell for borg user. Create a script to change this after every reboot. As root:
+    sudo /opt/bin/nano /usr/local/etc/rc.d/set-borg-shell.sh
 
-3. Paste these lines in the file. Then save and exit (ctrl+s and ctrl+x)
-#!/bin/sh
+    3. Paste these lines in the file. Then save and exit (ctrl+s and ctrl+x)
+    #!/bin/sh
 
-sed -i 's|^borg:.*:/sbin/nologin$|borg:x:1027:100:Borg Backup:/var/services/homes/borg:/bin/sh|' /etc/passwd
+    sed -i 's|^borg:.*:/sbin/nologin$|borg:x:1027:100:Borg Backup:/var/services/homes/borg:/bin/sh|' /etc/passwd
 
-3.1 WARNING! Change the borg user ID with correct values (you can check it in /etc/passwd)
+    3.1 WARNING! Change the borg user ID with correct values (you can check it in /etc/passwd)
 
-4. Add backupgroup group for borg user to give him access to some directories:
-sudo synogroup --add backupgroup borg 
-
-SECTION 4.1
-
-1. Add /opt/bin to PATH. As borg user execute:
-/opt/bin/nano ~/.profile
-
-2. Add at the end and save (ctrl+s and ctrl+x)
-export PATH=/opt/bin:/opt/sbin:$PATH
-export GPG_TTY=$(tty)
-
-3. Activate changes:
-source ~/.profile
+    4. Make it executable
+    sudo chmod +x /usr/local/etc/rc.d/set-borg-shell.sh
 
 SECTION 5 - Edit/add file in sudoers.d to allow borg to execute borg and socat commands as root (without password):
 
-1. Create directory if it doesn't exist and set permissions:
-mkdir -p /etc/sudoers.d
-sudo chmod 755 /etc/sudoers.d
+    1. Create directory if it doesn't exist and set permissions:
+    mkdir -p /etc/sudoers.d
+    sudo chmod 755 /etc/sudoers.d
 
-2. Create borg file in sudoers:
-sudo /opt/bin/nano /etc/sudoers.d/borg
+    2. Create borg file in sudoers:
+    sudo /opt/bin/nano /etc/sudoers.d/borg
 
-3. Add this line in the edited file, then save and exit (ctrl+s and ctrl+x):
-borg ALL=(root:root) NOPASSWD:SETENV: /opt/bin/borg
+    3. Add this line in the edited file, then save and exit (ctrl+s and ctrl+x):
+    borg ALL=(root:root) NOPASSWD:SETENV: /opt/bin/borg
 
-4. Set correct file permissions:
-sudo chmod 440 /etc/sudoers.d/borg
-sudo chown root:root /etc/sudoers.d/borg
+    4. Set correct file permissions:
+    sudo chmod 440 /etc/sudoers.d/borg
+    sudo chown root:root /etc/sudoers.d/borg
 
-SECTION 6 - Add socat and borg to borg user's default PATH:
+    5. Uncomment includedir line in /etc/sudoers and add @
+    from
+    #includedir /etc/sudoers.d
 
-1. Log in as root 
-sudo -i 
+    to
+    @includedir /etc/sudoers.d
 
-2. Switch to borg user
-su borg
+SECTION 6 - Add server's public key to .ssh directory on client to enable passwordless backup:
 
-3. Edit .profile for borg user
-/opt/bin/nano ~/.profile
+    1. On backup server execute as remote-backup user (edit your_public_ssh_key.pub according to your naming):
+    cat /home/remote-backup/.ssh/your_public_ssh_key.pub 
 
-4. Add at the end of file:
-export PATH=/opt/bin:/opt/sbin:$PATH
-‣ then save and exit (ctrl+s and ctrl+x)
+    2. Copy entire content to clipboard
 
-5. Activate changes:
-source ~/.profile
+    3. Create .ssh directory on NAS as borg user in his home directory if it doesn't exist
+    mkdir -p /var/services/homes/borg/.ssh
 
-6. Check if it works:
-socat -V
+    4. Create authorized_keys file for SSH
+    /opt/bin/nano /var/services/homes/borg/.ssh/authorized_keys
 
-SECTION 7 - Add server's public key to .ssh directory on client to enable passwordless backup:
+    5. Paste copied public key from server (example key below), then save file (ctrl+s and ctrl+x):
+    ssh-ed25519 AAAAC3NSDF3454Mgd5G/dfgIJFGDS534LOMS/GSDeei4MkSMGSD4 backup-pull-key
 
-1. On backup server execute as remote-backup user (edit your_public_ssh_key.pub according to your naming):
-cat /home/remote-backup/.ssh/your_public_ssh_key.pub 
+SECTION 7 - Enable SSH connection to borg user
 
-2. Copy entire content to clipboard
+    1. Edit /etc/ssh/sshd_config as root (or user with root privileges)
+    sudo /opt/bin/nano /etc/ssh/sshd_config
 
-3. Create .ssh directory on NAS as borg user in his home directory if it doesn't exist
-mkdir -p /var/services/homes/borg/.ssh
+    2. Change:
+    AllowTcpForwarding no
+    StreamLocalBindUnlink no
 
-4. Create authorized_keys file for SSH
-nano /var/services/homes/borg/.ssh/authorized_keys
+    to: 
+    AllowTcpForwarding yes
+    StreamLocalBindUnlink yes
 
-5. Paste copied public key from server (example key below), then save file (ctrl+s and ctrl+x):
-ssh-ed25519 AAAAC3NSDF3454Mgd5G/dfgIJFGDS534LOMS/GSDeei4MkSMGSD4 backup-pull-key
+    If any line is missing - add it
 
-SECTION 8 - Enable SSH connection to borg user
+    3. Save file and exit 
+    ctrl+s and ctrl+x
 
-1. Edit /etc/ssh/sshd_config as root (or user with root privileges)
-sudo nano /etc/ssh/sshd_config
+    4. Restart SSH
+    sudo synosystemctl restart sshd.service
 
-2. Change:
-AllowTcpForwarding no
-StreamLocalBindUnlink no
+    (Optional - depends on that, how would you like to pass your password to repository)
+    SECTION 8 - Install pass for password handling on client - execute this section as user with root privileges
 
-to: 
-AllowTcpForwarding yes
-StreamLocalBindUnlink yes
+        1. Go to /opt directory
+        cd /opt 
 
-If any line is missing - add it
+        2. Download pass package
+        sudo wget https://git.zx2c4.com/password-store/snapshot/password-store-master.tar.xz
 
-3. Save file and exit 
-ctrl+s and ctrl+x
+        3. Extract downloaded archive
+        sudo tar -xf password-store-master.tar.xz
 
-4. Restart SSH
-sudo synosystemctl restart sshd.service
+        4. Go to extracted directory
+        cd password-store-master
 
-(Optional)
-SECTION 9 - Install pass for password handling on client - execute this section as user with root privileges
+        5. Install "make" and other programs
+        sudo /opt/bin/opkg install make bash coreutils findutils grep sed pinentry
 
-1. Go to /opt directory
-cd /opt 
+        6. Build dependencies 
+        sudo 
 
-2. Download pass package
-sudo wget https://git.zx2c4.com/password-store/snapshot/password-store-master.tar.xz
+        7. Check if it works!
+        /opt/bin/pass --version
 
-3. Extract downloaded archive
-tar -xf password-store-master.tar.xz
+SECTION 9 - Create GPG key and pass password repository (as borg user)
 
-4. Go to extracted directory
-cd password-store-master
+    1. Create directory for gnupg as borg user
+    mkdir -p ~/.gnupg
 
-5. Install "make"
-sudo /opt/bin/opkg install make bash coreutils findutils grep sed pinentry
+    2. Set permissions
+    chmod 700 ~/.gnupg
 
-6. Build dependencies 
-/opt/bin/make install PREFIX=/opt
+    3. Edit file
+    /opt/bin/nano ~/.gnupg/gpg-agent.conf
 
-7. Check if it works!
-/opt/bin/pass --version
+    4. Enter in file, then save and exit (ctrl+s and ctrl+x)
+    pinentry-program /opt/bin/pinentry
 
-SECTION 10 - Create GPG key and pass password repository (as borg user)
+    5. Restart gpg-agent
+    gpgconf --kill gpg-agent
+    gpgconf --launch gpg-agent
 
-1. Create directory for gnupg
-mkdir -p ~/.gnupg
+    6. Create keygen.conf file
+    /opt/bin/nano ~/keygen.conf
 
-2. Set permissions
-chmod 700 ~/.gnupg
+    7. Paste in file, then save and exit (ctrl+s and ctrl+x)
+    Key-Type: RSA
+    Key-Length: 4096
+    Subkey-Type: RSA
+    Subkey-Length: 4096
+    Name-Real: Borg Backup
+    Expire-Date: 0
+    %no-protection
+    %commit
 
-3. Edit file
-/opt/bin/nano ~/.gnupg/gpg-agent.conf
+    8. Generate key
+    gpg --batch --generate-key ~/keygen.conf
 
-4. Enter in file, then save and exit (ctrl+s and ctrl+x)
-pinentry-program /opt/bin/pinentry
+    9. Check if key appeared
+    gpg --list-keys
 
-5. Restart gpg-agent
-gpgconf --kill gpg-agent
-gpgconf --launch gpg-agent
+    10. Copy the long string, example
+    E5435GDSGIOSDF90345DSGOJSGD34DGSF
 
-6. Create keygen.conf file
-/opt/bin/nano ~/keygen.conf
+    11. Initialize pass repository (change paste_your_copied_string to value copied in point 10.)
+    /opt/bin/pass init paste_your_copied_string
 
-7. Paste in file, then save and exit (ctrl+s and ctrl+x)
-Key-Type: RSA
-Key-Length: 4096
-Subkey-Type: RSA
-Subkey-Length: 4096
-Name-Real: Borg Backup
-Expire-Date: 0
-%no-protection
-%commit
+    12. Create password for borg repository located on backup server
+    /opt/bin/pass insert repozytoria/borg/nas_synology
 
-8. Generate key
-gpg --batch --generate-key keygen.conf
+    13. Remove keygen.conf
+    rm -f ~/keygen.conf
 
-9. Check if key appeared
-gpg --list-keys
-
-10. Copy the long string, example
-E5435GDSGIOSDF90345DSGOJSGD34DGSF
-
-11. Initialize pass repository (change paste_your_copied_string to value copied in point 10.)
-/opt/bin/pass init paste_your_copied_string
-
-12. Create password for borg repository located on backup server
-/opt/bin/pass insert repozytoria/borg/nas_synology
-
-13. Remove keygen.conf
-rm -f ~/keygen.conf
-
-(Optional)
-14. Check if it works
-/opt/bin/pass show repozytoria/borg/nas_synology
+    (Optional)
+        14. Check if it works
+        /opt/bin/pass show repozytoria/borg/nas_synology
