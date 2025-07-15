@@ -1,0 +1,44 @@
+# Restore backup to the client
+script -> run_restore.sh
+
+Command structure:
+path_to_script client_to_which_the_backup_is_to_be_restored full_name_of_specific_backup path_to_the_client_where_the_backup_is_to_be_restored
+
+Example:
+sudo /home/remote-backup/backup/run_restore.sh client2 backup-2025-07-10_20:59 /tmp/restore
+
+Warning!
+The borg user on the client should have permissions to the directory you want to upload the backup to
+
+
+# Run backup manually 
+script -> run_backup.sh
+
+Command structure:
+path_to_script specific_client
+
+Example:
+/home/remote-backup/backup/run_backup.sh client2
+
+
+# Change time for daily backups
+script -> change_backup_hour.sh
+
+Command structure:
+path_to_script specific_client new_time
+
+Example:
+sudo /home/remote-backup/backup/change_backup_hour.sh client2 03:00:00
+
+
+# Change paths to backup
+file -> backup.conf
+
+WARNING!
+If you want to change this file you have to be in /home/remote-backup/backup catalogue because changing that file is restricted. To edit that file, you need to use:
+sudo nano backup.conf
+
+Change line "dirs". You can add more then 1 path by place them after "space"
+
+Example:
+dirs=/home/catalogue1 /root /etc
