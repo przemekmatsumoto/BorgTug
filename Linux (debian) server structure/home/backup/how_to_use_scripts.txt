@@ -1,11 +1,14 @@
 # Restore backup to the client
 script -> run_restore.sh
 
+WARNING!
+If you want to change this file you have to be in /home/remote-backup/backup catalogue.
+
 Command structure:
-path_to_script client_to_which_the_backup_is_to_be_restored full_name_of_specific_backup path_to_the_client_where_the_backup_is_to_be_restored
+./path_to_script client_to_which_the_backup_is_to_be_restored full_name_of_specific_backup path_to_the_client_where_the_backup_is_to_be_restored
 
 Example:
-sudo /home/remote-backup/backup/run_restore.sh client2 backup-2025-07-10_20:59 /tmp/restore
+./run_restore.sh client2 backup-2025-07-10_20:59 /tmp/restore
 
 Warning!
 The borg user on the client should have permissions to the directory you want to upload the backup to
@@ -14,18 +17,21 @@ The borg user on the client should have permissions to the directory you want to
 # Run backup manually 
 script -> run_backup.sh
 
+WARNING!
+If you want to change this file you have to be in /home/remote-backup/backup catalogue.
+
 Command structure:
-path_to_script specific_client
+./path_to_script specific_client
 
 Example:
-/home/remote-backup/backup/run_backup.sh client2
+./run_backup.sh client2
 
 
 # Change time for daily backups
 script -> change_backup_hour.sh
 
 Command structure:
-path_to_script specific_client new_time
+./path_to_script specific_client new_time
 
 Example:
 sudo /home/remote-backup/backup/change_backup_hour.sh client2 03:00:00
