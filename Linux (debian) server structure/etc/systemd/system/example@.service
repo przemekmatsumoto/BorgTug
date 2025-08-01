@@ -1,0 +1,12 @@
+[Unit]
+Description=You can put here whatever you want
+After=network-online.target your_socket_name.socket # Change your_socket_name!
+Requires=your_socket_name.socket # Change your_socket_name!
+
+[Service]
+ExecStart=borg serve --append-only --restrict-to-path /path/to/your/borg/repository # Change path!
+Type=simple
+User=remote-backup
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
