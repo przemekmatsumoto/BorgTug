@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
 CONFIG_FILE="/home/remote-backup/backup/backup.conf"
 CLIENT="$1"
-TIMESTAMP=$(date '+%Y-%m-%d_%H:%M')
+ARCHIVE="$2"
+DESTDIR="${3:-/}"
 
 function notify_slack {
   local msg="$1"
@@ -13,30 +15,34 @@ function notify_slack {
     curl -s -X POST --data "{\"text\": \"$msg\"}" "$webhook" >/dev/null || true
 }
 
-
 SSH_HOST=$(crudini --get "$CONFIG_FILE" "$CLIENT" ssh_host)
-SOCKET_LOCAL=$(crudini --get "$CONFIG_FILE" "$CLIENT" socket_local)
 SOCKET_REMOTE=$(crudini --get "$CONFIG_FILE" "$CLIENT" socket_remote)
+SOCKET_LOCAL=$(crudini --get "$CONFIG_FILE" "$CLIENT" socket_local)
 BORG=$(crudini --get "$CONFIG_FILE" "$CLIENT" borg_binary)
 SOCAT=$(crudini --get "$CONFIG_FILE" "$CLIENT" socat_binary)
 PASSCMD=$(crudini --get "$CONFIG_FILE" "$CLIENT" passcommand)
 REPO=$(crudini --get "$CONFIG_FILE" "$CLIENT" repo)
-DIRS=$(crudini --get "$CONFIG_FILE" "$CLIENT" dirs)
+
+REMOTE_CMD=$(cat <<EOF
+mkdir -p "$DESTDIR" && \
+cd "$DESTDIR" && \
+sudo -E BORG_PASSCOMMAND='$PASSCMD' \
+$BORG --rsh="sh -c 'exec $SOCAT STDIO UNIX-CONNECT:$SOCKET_REMOTE'" \
+extract --progress ${REPO}::${ARCHIVE}
+EOF
+)
+
 
 SSH_CMD=(
-  ssh -o BatchMode=yes -R "${SOCKET_LOCAL}:${SOCKET_REMOTE}" -t "$SSH_HOST"
-  "sudo -E BORG_PASSCOMMAND='$PASSCMD' \
-    $BORG --rsh=\"sh -c 'exec $SOCAT STDIO UNIX-CONNECT:$SOCKET_LOCAL'\" \
-    create --progress ${REPO}::backup-${TIMESTAMP} $DIRS"
+  ssh -o BatchMode=yes -R "${SOCKET_REMOTE}:${SOCKET_LOCAL}" "$SSH_HOST"
+  "$REMOTE_CMD"
 )
 
 if ! "${SSH_CMD[@]}"; then
-  MSG="❌ Backup *${CLIENT}* failed at ${TIMESTAMP}. Serwer albo klient spadł z rowerka, trzeba ratować!"
-  notify_slack "$MSG"
+  notify_slack "❌ Restore *${CLIENT}* :: *${ARCHIVE}* failed to ${DESTDIR}"
   exit 1
 else
-  MSG="✅ Backup *${CLIENT}* succeeded at ${TIMESTAMP}"
-  notify_slack "$MSG"
+  notify_slack "✅ Restore *${CLIENT}* :: *${ARCHIVE}* completed to ${DESTDIR}"
 fi
 
 exit 0

@@ -1,0 +1,8 @@
+[Unit]
+Description=You can put here whatever you want
+PartOf=your_service_name@.service # Change your_service_name!
+
+[Socket]
+ListenStream=/path/where/the/sock/will/be/created # Change path!
+Accept=Yes
+SocketUser=remote-backup

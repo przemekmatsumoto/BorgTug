@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily backup for client1 # Change 'client1' to correct name!
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 # Set the backup date and time
+Persistent=true
+
+[Install]
+WantedBy=timers.target
