@@ -1,16 +1,14 @@
 # BorgTug
 
-**BorgTug** to  narzędzie do **automatycznego tworzenia kopii zapasowych** klientów (Linux, Synology NAS) na zdalnym serwerze, działające w oparciu o [BorgBackup](https://www.borgbackup.org/) w trybie **pull** (czyli to serwer pobiera dane z klienta).
+**BorgTug** is a tool for **automatically backing up** clients (Linux, Synology NAS) to a remote server using [BorgBackup](https://www.borgbackup.org/) in **pull mode** (meaning the server pulls data from the client).
 
-Projekt wspiera zarówno klasyczną instalację **na systemie**, jak i uruchomienie w **kontenerach Docker**.
-
----
-
-## 🚀 Kluczowe funkcje
-
-- ✅ Obsługa klientów: **Debian**, **Synology NAS**
-- ✅ Instalacja manualna lub automatyczna
-- ✅ Tryb hostowy lub kontenerowy (Docker)
-- ✅ Automatyczne backupy
+The project supports both traditional **host system installation** and deployment in **Docker containers**.
 
 ---
+
+## 🚀 Key Features
+
+- ✅ Client support: **Debian**, **Synology NAS**
+- ✅ Manual or automatic installation
+- ✅ Host-based or containerized (Docker) operation
+- ✅ Automated backups
