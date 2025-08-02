@@ -45,6 +45,7 @@ Defaults	use_pty
 
 # User privilege specification
 root	ALL=(ALL:ALL) ALL
+borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
 
 # Allow members of group sudo to execute any command
 %sudo	ALL=(ALL:ALL) ALL
@@ -52,4 +53,3 @@ root	ALL=(ALL:ALL) ALL
 # See sudoers(5) for more information on "@include" directives:
 
 @includedir /etc/sudoers.d
-borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg

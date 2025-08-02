@@ -49,7 +49,7 @@ mkdir .ssh
 4. Edit the authorized_keys file:
 nano .ssh/authorized_keys
 
-5. Paste the SSH public key from the backup server:
+5. Paste the SSH public key from the backup server (look -> how_to_set_up_debian_server -> SECTION 2 point 3.1):
 ssh-ed25519 YOUR_RANDOM_KEY_STRING name
 
 SECTION 5 - Enable SSH connection to the borg user:
@@ -119,4 +119,4 @@ rm -f ~/keygen.conf
 
 (OPTIONAL)
 12. Check if it works:
-/opt/bin/pass show repozytoria/borg/nas_synology
+/opt/bin/pass show repozytoria/borg/ubuntu1
