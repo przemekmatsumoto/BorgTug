@@ -1,6 +1,14 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -eq 0 ]; then
+    echo "Backup hours for all clients:"
+    for TIMER_FILE in /etc/systemd/system/backup@*.timer; do
+        CLIENT=$(basename "$TIMER_FILE" .timer | sed 's/backup@//')
+        BACKUP_TIME=$(grep -oP '(?<=^OnCalendar=).*' "$TIMER_FILE")
+        echo "Client: $CLIENT, Backup time: $BACKUP_TIME"
+    done
+    exit 0
+elif [ "$#" -ne 2 ]; then
     echo "Use: $0 <clientX> <HH:MM:SS>"
     exit 1
 fi
@@ -20,4 +28,4 @@ sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl restart backup@${CLIENT}.timer
 
-echo "Timer hour ${CLIENT} to ${TIME} was changed"
+echo "Timer for ${CLIENT} was changed to ${TIME}"

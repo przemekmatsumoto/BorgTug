@@ -10,3 +10,38 @@ User=remote-backup
 StandardInput=socket
 StandardOutput=socket
 StandardError=journal
+
+
+
+
+# Examples:
+#
+# First example (nas synology):
+#
+#    [Unit]
+#    Description=Serve Remote Borg Backup - nas1
+#    After=network-online.target nas1.socket
+#    Requires=nas1.socket
+#
+#    [Service]
+#    ExecStart=borg serve --append-only --restrict-to-path /mnt/backup/nas1
+#    Type=simple
+#    User=remote-backup
+#    StandardInput=socket
+#    StandardOutput=socket
+#    StandardError=journal
+#
+# Second example (debian):
+#
+#    [Unit]
+#    Description=Serve Remote Borg Backup - debian1
+#    After=network-online.target debian1.socket
+#    Requires=debian1.socket
+#
+#    [Service]
+#    ExecStart=borg serve --append-only --restrict-to-path /mnt/backup/debian1
+#    Type=simple
+#    User=remote-backup
+#    StandardInput=socket
+#    StandardOutput=socket
+#    StandardError=journal

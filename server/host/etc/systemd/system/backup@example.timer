@@ -1,9 +1,24 @@
 [Unit]
-Description=Daily backup for client1 # Change 'client1' to correct name!
+Description=Whatever you want
 
 [Timer]
-OnCalendar=*-*-* 02:00:00 # Set the backup date and time
+OnCalendar=*-*-* 02:00:00 # Set the backup date and time!
 Persistent=true
 
 [Install]
 WantedBy=timers.target
+
+
+
+
+# Example:
+#
+#    [Unit]
+#    Description=Daily backup for debian1
+#
+#    [Timer]
+#    OnCalendar=*-*-* 03:00:00
+#    Persistent=true
+#
+#    [Install]
+#    WantedBy=timers.target

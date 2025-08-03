@@ -6,3 +6,39 @@ PartOf=your_service_name@.service # Change your_service_name!
 ListenStream=/path/where/the/sock/will/be/created # Change path!
 Accept=Yes
 SocketUser=remote-backup
+
+[Install]
+WantedBy=sockets.target
+
+
+
+
+# Examples:
+#
+# First example (nas synology):
+#
+#    [Unit]
+#    Description=Borg Backup Socket - nas1
+#    PartOf=nas1@.service
+#
+#    [Socket]
+#    ListenStream=/run/remote-backup/nas1.sock
+#    Accept=Yes
+#    SocketUser=remote-backup
+#
+#    [Install]
+#    WantedBy=sockets.target
+#
+# Second example (debian):
+#
+#    [Unit]
+#    Description=Borg Backup Socket - debian1
+#    PartOf=remote-backup-debian1@.service
+#
+#    [Socket]
+#    ListenStream=/run/remote-backup/debian1.sock
+#    Accept=yes
+#    SocketUser=remote-backup
+#
+#    [Install]
+#    WantedBy=sockets.target
