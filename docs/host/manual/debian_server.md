@@ -148,7 +148,13 @@ SECTION 8 - Create service, timers for automatic backup and script to change bac
     7. Add the line:
     remote-backup ALL=(ALL) /home/remote-backup/backup/change_backup_hour.sh
 
-SECTION 9 - Set timers to autostart
+SECTION 9 - Set timers and sockets to be enabled on startup
 
     1. Enable timer to start at system boot (Change your_timer_name to the appropriate client name -> see SECTION 8 point 3):
     sudo systemctl enable backup@your_timer_name.timer
+
+    2. Enable socket to start at system boot (Change your_name_for_socket to the appropriate client name -> see SECTION 5 point 3):
+    sudo systemctl enable your_name_for_socket.socket
+
+    3. Start your socket (after reboot it will start automatically):
+    sudo systemctl start your_name_for_socket.socket
