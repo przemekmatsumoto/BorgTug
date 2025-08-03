@@ -27,11 +27,14 @@ Example:
 ./run_backup.sh client2
 
 
-# Change time for daily backups
+# Check/Change time for daily backups
 script -> change_backup_hour.sh
 
-Command structure:
-./path_to_script specific_client new_time
+Check backups time command structure:
+sudo ./path_to_script
+
+Change time command structure:
+sudo ./path_to_script specific_client new_time
 
 Example:
 sudo /home/remote-backup/backup/change_backup_hour.sh client2 03:00:00
