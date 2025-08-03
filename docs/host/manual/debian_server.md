@@ -1,8 +1,7 @@
-
 SECTION 1 - Creating the remote-backup user
 
     1. Add remote-backup user:
-    sudo adduser remote-backup 
+    sudo adduser remote-backup
 
 SECTION 2 - Generate ssh key and create a config file as remote-backup user
 
@@ -13,7 +12,7 @@ SECTION 2 - Generate ssh key and create a config file as remote-backup user
     mkdir -p ~/.ssh && chmod 700 ~/.ssh
 
     3. Generate ssh key as remote-backup user (change your_name_for_key):
-    ssh-keygen -t ed25519 -f /home/remote-backup/.ssh/your_name_for_key -N "" 
+    ssh-keygen -t ed25519 -f /home/remote-backup/.ssh/your_name_for_key -N ""
 
 SECTION 3.1 - Part of how to setup client
 
@@ -90,13 +89,13 @@ SECTION 6 - Create backup configuration file, backup script, and restore script
 
     7. Set permissions for the created files:
     chmod 640 ~/backup/backup.conf
-    chmod 755 ~/backup/run_backup.sh 
-    chmod 750 ~/backup/run_restore.sh 
+    chmod 755 ~/backup/run_backup.sh
+    chmod 750 ~/backup/run_restore.sh
 
     8. Assign files to specific owners (execute these commands as root user (su your_root_user)):
     sudo chown root:remote-backup /home/remote-backup/backup/backup.conf
-    sudo chown root:root /home/remote-backup/backup/run_backup.sh 
-    sudo chown root:remote-backup /home/remote-backup/backup/run_restore.sh 
+    sudo chown root:root /home/remote-backup/backup/run_backup.sh
+    sudo chown root:remote-backup /home/remote-backup/backup/run_restore.sh
 
     WARNING!
     After applying the changes from steps 7 and 8, some files will require root privileges for editing.
@@ -148,7 +147,13 @@ SECTION 8 - Create service, timers for automatic backup and script to change bac
     7. Add the line:
     remote-backup ALL=(ALL) /home/remote-backup/backup/change_backup_hour.sh
 
-SECTION 9 - Set timers to autostart
+SECTION 9 - Set timers and sockets to be enabled on startup
 
     1. Enable timer to start at system boot (Change your_timer_name to the appropriate client name -> see SECTION 8 point 3):
     sudo systemctl enable backup@your_timer_name.timer
+
+    2. Enable socket to start at system boot (Change your_name_for_socket to the appropriate client name -> see SECTION 5 point 3):
+    sudo systemctl enable your_name_for_socket.socket
+
+    3. Start your socket (after reboot it will start automatically):
+    sudo systemctl start your_name_for_socket.socket
