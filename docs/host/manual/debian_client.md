@@ -1,122 +1,180 @@
-SECTION 1:
+## 📁 debian_client.md
+
+### SECTION 1 — Install dependencies
 
 1. Install ssh, socat, borgbackup:
-sudo apt install ssh socat borgbackup -y
+   ```bash
+   sudo apt install ssh socat borgbackup -y
+   ```
 
-SECTION 2:
+### SECTION 2 — Connect to the server
 
 1. Connect to your Debian server:
-ssh your_user_with_root_privileges@debian_ip_address
+   ```bash
+   ssh your_user_with_root_privileges@debian_ip_address
+   ```
 
-SECTION 3:
+### SECTION 3 — Add and configure the borg user
 
 1. Add the borg user:
-sudo adduser borg
-
-Go through the setup, create a password (the rest is optional), and confirm by pressing T and Enter at the end.
+   ```bash
+   sudo adduser borg
+   ```
+   Go through the setup, create a password (the rest is optional), and confirm by pressing T and Enter at the end.
 
 2. Edit the sudoers file:
-sudo visudo
+   ```bash
+   sudo visudo
+   ```
 
-(OPTIONAL)
-2.1 Create the file /etc/sudoers.d/borg
-sudo nano /etc/sudoers.d/borg
+   *(OPTIONAL)*
 
-2.2 Paste the line:
-borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
+   2.1 Create the file `/etc/sudoers.d/borg`:
+   ```bash
+   sudo nano /etc/sudoers.d/borg
+   ```
 
-2.3 Set the correct permissions:
-sudo chmod 0440 /etc/sudoers.d/borg
-sudo chown root:root /etc/sudoers.d/borg
+   2.2 Paste the line:
+   ```bash
+   borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
+   ```
 
-2.4 You can check if it works:
-sudo visudo -f /etc/sudoers.d/borg
+   2.3 Set the correct permissions:
+   ```bash
+   sudo chmod 0440 /etc/sudoers.d/borg
+   sudo chown root:root /etc/sudoers.d/borg
+   ```
 
-3. Add the following line in the edited file, then save and exit (Ctrl+S and Ctrl+X):
-borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
+   2.4 You can check if it works:
+   ```bash
+   sudo visudo -f /etc/sudoers.d/borg
+   ```
 
-SECTION 4 - Add the server's public key to the .ssh directory on the client to enable passwordless backup:
+3. Add the following line in the edited file, then save and exit (`Ctrl+S` and `Ctrl+X`):
+   ```bash
+   borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
+   ```
+
+### SECTION 4 — Add the server's public key to the `.ssh` directory on the client to enable passwordless backup
 
 1. Switch to the borg user:
-su borg
+   ```bash
+   su borg
+   ```
 
 2. Change to the borg user's home directory:
-cd ~
+   ```bash
+   cd ~
+   ```
 
-3. Create the .ssh directory in the borg user's home:
-mkdir .ssh
+3. Create the `.ssh` directory:
+   ```bash
+   mkdir .ssh
+   ```
 
-4. Edit the authorized_keys file:
-nano .ssh/authorized_keys
+4. Edit the `authorized_keys` file:
+   ```bash
+   nano .ssh/authorized_keys
+   ```
 
-5. Paste the SSH public key from the backup server (look -> how_to_set_up_debian_server -> SECTION 2 point 3.1):
-ssh-ed25519 YOUR_RANDOM_KEY_STRING name
+5. Paste the SSH public key from the backup server (see: [debian_server SECTION 2 point 3.1](debian_server.md)):
+   ```
+   ssh-ed25519 YOUR_RANDOM_KEY_STRING name
+   ```
 
-SECTION 5 - Enable SSH connection to the borg user:
+### SECTION 5 — Enable SSH connection to the borg user
 
-1. Edit the /etc/ssh/sshd_config file as root (or a user with root privileges):
-sudo nano /etc/ssh/sshd_config
+1. Edit the `/etc/ssh/sshd_config` file:
+   ```bash
+   sudo nano /etc/ssh/sshd_config
+   ```
 
 2. Set:
-AllowTcpForwarding no
-StreamLocalBindUnlink no
+   ```
+   AllowTcpForwarding no
+   StreamLocalBindUnlink no
+   ```
+   to:
+   ```
+   AllowTcpForwarding yes
+   StreamLocalBindUnlink yes
+   ```
 
-to:
-AllowTcpForwarding yes
-StreamLocalBindUnlink yes
-
-If any line is missing, add it.
-
-3. Save the file and exit:
-Ctrl+S and Ctrl+X
+3. Save and exit (`Ctrl+S` and `Ctrl+X`)
 
 4. Restart SSH:
-sudo systemctl restart sshd.service
+   ```bash
+   sudo systemctl restart sshd.service
+   ```
 
-(OPTIONAL)
-SECTION 6 - Install pass for password handling on the client - execute this section as a user with root privileges:
+---
 
-1. Install pass:
-sudo apt install pass
+### SECTION 6 *(OPTIONAL)* — Install `pass` for password handling on the client
+
+1. Install `pass`:
+   ```bash
+   sudo apt install pass
+   ```
 
 2. As the borg user, create a directory for the GnuPG key:
-su borg
-mkdir -p ~/.gnupg
+   ```bash
+   su borg
+   mkdir -p ~/.gnupg
+   ```
 
 3. Set permissions:
-chmod 700 ~/.gnupg
+   ```bash
+   chmod 700 ~/.gnupg
+   ```
 
-4. Create the keygen.conf file:
-nano ~/keygen.conf
+4. Create the `keygen.conf` file:
+   ```bash
+   nano ~/keygen.conf
+   ```
 
-5. Paste the following into the file, then save and exit (Ctrl+S and Ctrl+X):
-Key-Type: RSA
-Key-Length: 4096
-Subkey-Type: RSA
-Subkey-Length: 4096
-Name-Real: Borg Backup
-Expire-Date: 0
-%no-protection
-%commit
+5. Paste the following:
+   ```
+   Key-Type: RSA
+   Key-Length: 4096
+   Subkey-Type: RSA
+   Subkey-Length: 4096
+   Name-Real: Borg Backup
+   Expire-Date: 0
+   %no-protection
+   %commit
+   ```
 
 6. Generate the key:
-gpg --batch --generate-key keygen.conf
+   ```bash
+   gpg --batch --generate-key keygen.conf
+   ```
 
 7. Check if the key appears:
-gpg --list-keys
+   ```bash
+   gpg --list-keys
+   ```
 
-8. Copy the long string, e.g.:
-E5435GDSGIOSDF90345DSGOJSGD34DGSF
+8. Copy the long string (example):
+   ```
+   E5435GDSGIOSDF90345DSGOJSGD34DGSF
+   ```
 
-9. Initialize the pass repository (replace paste_your_copied_string with the value copied in step 8):
-pass init paste_your_copied_string
+9. Initialize the pass repository:
+   ```bash
+   pass init paste_your_copied_string
+   ```
 
-10. Create a password for the borg repository located on the backup server:
-pass insert repozytoria/borg/ubuntu1
+10. Create a password for the borg repository:
+    ```bash
+    pass insert repozytoria/borg/debian1
+    ```
 
-11. Remove keygen.conf:
-rm -f ~/keygen.conf
+11. Remove `keygen.conf`:
+    ```bash
+    rm -f ~/keygen.conf
+    ```
 
-(OPTIONAL)
-12. Check if it works:
-/opt/bin/pass show repozytoria/borg/ubuntu1
+12. *(Optional)* Check if it works:
+    ```bash
+    pass show repozytoria/borg/debian1
+    ```
