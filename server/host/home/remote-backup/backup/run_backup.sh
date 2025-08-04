@@ -31,7 +31,7 @@ SSH_CMD=(
 )
 
 if ! "${SSH_CMD[@]}"; then
-  MSG="❌ Backup *${CLIENT}* failed at ${TIMESTAMP}. Serwer albo klient spadł z rowerka, trzeba ratować!"
+  MSG="❌ Backup *${CLIENT}* failed at ${TIMESTAMP}"
   notify_slack "$MSG"
   exit 1
 else

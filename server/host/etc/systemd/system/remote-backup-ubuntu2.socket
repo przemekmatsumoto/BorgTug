@@ -1,8 +1,0 @@
-[Unit]
-Description=Borg Backup Socket - ubuntu2
-PartOf=remote-backup-ubuntu2@.service
-
-[Socket]
-ListenStream=/run/remote-backup/ubuntu2.sock
-Accept=yes
-SocketUser=remote-backup

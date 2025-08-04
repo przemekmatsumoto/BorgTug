@@ -1,8 +1,0 @@
-[Unit]
-Description=Borg Backup Socket - nas-synology1
-PartOf=remote-backup-nas-synology1@.service
-
-[Socket]
-ListenStream=/run/remote-backup/nas-synology1.sock
-Accept=Yes
-SocketUser=remote-backup
