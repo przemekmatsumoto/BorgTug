@@ -22,67 +22,50 @@
    ```
    Go through the setup, create a password (the rest is optional), and confirm by pressing T and Enter at the end.
 
-2. Edit the sudoers file:
-   ```bash
-   sudo visudo
-   ```
-
-   *(OPTIONAL)*
-
-   2.1 Create the file `/etc/sudoers.d/borg`:
+2. Create the file `/etc/sudoers.d/borg`:
    ```bash
    sudo nano /etc/sudoers.d/borg
    ```
 
-   2.2 Paste the line:
+3. Paste the line:
    ```bash
-   borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
+   borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/docker
    ```
 
-   2.3 Set the correct permissions:
+4. Set the correct permissions:
    ```bash
    sudo chmod 0440 /etc/sudoers.d/borg
    sudo chown root:root /etc/sudoers.d/borg
    ```
 
-   2.4 You can check if it works:
+5. You can check if it works:
    ```bash
    sudo visudo -f /etc/sudoers.d/borg
    ```
 
-3. Add the following line in the edited file, then save and exit (`Ctrl+S` and `Ctrl+X`):
+---
+
+### SECTION 4 — Add server’s SSH key to Debian client
+
+1. On debian client (as `borg`):
    ```bash
-   borg ALL=(root:root) NOPASSWD:SETENV: /usr/bin/borg
+   mkdir -p ~/.ssh
+   nano /home/borg/.ssh/authorized_keys
    ```
 
-### SECTION 4 — Add the server's public key to the `.ssh` directory on the client to enable passwordless backup
-
-1. Switch to the borg user:
+2. Edit the `authorized_keys` file:
    ```bash
-   su borg
+   nano ~/.ssh/authorized_keys
    ```
 
-2. Change to the borg user's home directory:
-   ```bash
-   cd ~
+3. Paste the SSH public key from the backup server (see: [How to copy 2.1](/docs/host/manual/debian_server.md)):
+   ```
+   ssh-ed25519 <YOUR_KEY> borg-backup
    ```
 
-3. Create the `.ssh` directory:
-   ```bash
-   mkdir .ssh
-   ```
+---
 
-4. Edit the `authorized_keys` file:
-   ```bash
-   nano .ssh/authorized_keys
-   ```
-
-5. Paste the SSH public key from the backup server (see: [debian_server SECTION 2 point 3.1](debian_server.md)):
-   ```
-   ssh-ed25519 YOUR_RANDOM_KEY_STRING name
-   ```
-
-### SECTION 5 — Enable SSH connection to the borg user
+### SECTION 5 — Change SSH config 
 
 1. Edit the `/etc/ssh/sshd_config` file:
    ```bash
@@ -127,54 +110,42 @@
    chmod 700 ~/.gnupg
    ```
 
-4. Create the `keygen.conf` file:
+4. Create the `keygen.conf` file (see: [example](/clients/host/keygen.conf)):
    ```bash
    nano ~/keygen.conf
    ```
 
-5. Paste the following:
-   ```
-   Key-Type: RSA
-   Key-Length: 4096
-   Subkey-Type: RSA
-   Subkey-Length: 4096
-   Name-Real: Borg Backup
-   Expire-Date: 0
-   %no-protection
-   %commit
-   ```
-
-6. Generate the key:
+5. Generate the key:
    ```bash
    gpg --batch --generate-key keygen.conf
    ```
 
-7. Check if the key appears:
+6. Check if the key appears:
    ```bash
    gpg --list-keys
    ```
 
-8. Copy the long string (example):
+7. Copy the long string (example):
    ```
    E5435GDSGIOSDF90345DSGOJSGD34DGSF
    ```
 
-9. Initialize the pass repository:
+8. Initialize the pass repository:
    ```bash
    pass init paste_your_copied_string
    ```
 
-10. Create a password for the borg repository:
+9. Create a password for the borg repository:
     ```bash
-    pass insert repozytoria/borg/debian1
+    pass insert repositories/borg/debian1
     ```
 
-11. Remove `keygen.conf`:
+10. Remove `keygen.conf`:
     ```bash
     rm -f ~/keygen.conf
     ```
 
-12. *(Optional)* Check if it works:
+11. *(Optional)* Check if it works:
     ```bash
-    pass show repozytoria/borg/debian1
+    pass show repositories/borg/debian1
     ```
