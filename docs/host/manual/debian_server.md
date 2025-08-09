@@ -31,17 +31,19 @@
 
 ### SECTION 2.1 — Copy SSH key and configure client access
 
-1. Copy the SSH public key *(change `your_name_for_key`)*:
+1. Copy the output of this command *(change `your_name_for_key`)*:
    ```bash
    cat /home/remote-backup/.ssh/your_name_for_key.pub
    ```
 
-2. Create config file:
+### SECTION 2.2 - Configure SSH client access
+
+1. Create config file:
    ```bash
    touch /home/remote-backup/.ssh/config
    ```
 
-3. Add configuration depending on number of clients (see example → `server/host/home/.ssh/config`)
+2. Add configuration depending on number of clients. See **[example](/server/config)**
 
 ---
 
@@ -97,14 +99,14 @@
    sudo touch /etc/systemd/system/your_service_name@.service
    ```
 
-2. Write configuration (see example → `server/host/etc/systemd/system/example@.service`)
+2. Write configuration See **[example](/server/example@.service)**
 
 3. Create socket *(change `your_name_for_socket`)*:
    ```bash
    sudo touch /etc/systemd/system/your_name_for_socket.socket
    ```
 
-4. Write configuration (see example → `server/host/etc/systemd/system/example.socket`)
+4. Write configuration See **[example](/server/example.socket)**
 
 ⚠️ The `remote-backup` user must have permissions to the socket directory:
 ```bash
@@ -113,7 +115,7 @@ sudo chown remote-backup:remote-backup /path/where/the/sock/will/be/
 
 ---
 
-### SECTION 6 — Create backup configuration, backup script, and restore script
+### SECTION 6 — Create backup configuration and backup script
 
 1. Switch to `remote-backup` user:
    ```bash
@@ -130,33 +132,26 @@ sudo chown remote-backup:remote-backup /path/where/the/sock/will/be/
    chmod 700 ~/backup
    ```
 
-4. Create backup config file (see example → `server/host/home/backup/backup.conf`):
+4. Create backup config file See **[example](/server/backup.conf)**:
    ```bash
    nano ~/backup/backup.conf
    ```
 
-5. Create backup script (see example → `server/host/home/backup/run_backup.sh`):
+5. Create backup script See **[example](/server/run_backup.sh)**:
    ```bash
    nano ~/backup/run_backup.sh
-   ```
-
-6. Create restore script (see example → `server/host/home/backup/run_restore.sh`):
-   ```bash
-   nano ~/backup/run_restore.sh
    ```
 
 7. Set permissions:
    ```bash
    chmod 640 ~/backup/backup.conf
    chmod 755 ~/backup/run_backup.sh
-   chmod 750 ~/backup/run_restore.sh
    ```
 
 8. Set owners *(as root)*:
    ```bash
    sudo chown root:remote-backup /home/remote-backup/backup/backup.conf
    sudo chown root:root /home/remote-backup/backup/run_backup.sh
-   sudo chown root:remote-backup /home/remote-backup/backup/run_restore.sh
    ```
 
 ⚠️ Some files will require root privileges for editing.
@@ -198,12 +193,12 @@ sudo chown remote-backup:remote-backup /path/where/the/sock/will/be/
    sudo touch /etc/systemd/system/backup@.service
    ```
 
-2. Paste config (See example → `backup@.service`):
+2. Paste config See **[example](/server/backup@.service)**:
    ```bash
    sudo nano /etc/systemd/system/backup@.service
    ```
 
-3. Create timer and set time (see example → `backup@example.timer`):
+3. Create timer and set time **[example](/server/backup@example.timer)**:
    ```bash
    sudo nano /etc/systemd/system/backup@example.timer
    ```

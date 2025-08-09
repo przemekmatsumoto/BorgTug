@@ -56,7 +56,7 @@
 
 ---
 
-### Optional — Nano editor
+### *(Optional)* SECTION 2.1 — Nano editor
 
 1. Install nano:
    ```bash
@@ -69,7 +69,7 @@
 
 ---
 
-### Optional — Entware access after reboot
+### *(Optional)* SECTION 2.2 — Entware access after reboot
 
 1. Edit startup script:
    ```bash
@@ -174,22 +174,19 @@
 
 ### SECTION 6 — Add server’s SSH key to NAS
 
-1. On backup server (as `remote-backup`):
-   ```bash
-   cat /home/remote-backup/.ssh/your_public_ssh_key.pub
-   ```
-
-2. Copy output
-
-3. On NAS (as `borg`):
+1. On NAS (as `borg`):
    ```bash
    mkdir -p /var/services/homes/borg/.ssh
+   ```
+
+2. Edit the `authorized_keys` file (use your text editor):
+   ```bash
    /opt/bin/nano /var/services/homes/borg/.ssh/authorized_keys
    ```
 
-4. Paste key:
+3. Paste the SSH public key from the backup server (see: [How to copy 2.1](/docs/host/manual/debian_server.md)):
    ```
-   ssh-ed25519 AAAAC3NSDF3454Mgd5G/dfgIJFGDS534LOMS/GSDeei4MkSMGSD4 backup-pull-key
+   ssh-ed25519 <YOUR_KEY> borg-backup
    ```
 
 ---
@@ -275,54 +272,42 @@
    gpgconf --launch gpg-agent
    ```
 
-5. Create `keygen.conf`:
+5. Create `keygen.conf` (see: [example](/clients/host/keygen.conf)):
    ```bash
    /opt/bin/nano ~/keygen.conf
    ```
 
-6. Paste:
-   ```
-   Key-Type: RSA
-   Key-Length: 4096
-   Subkey-Type: RSA
-   Subkey-Length: 4096
-   Name-Real: Borg Backup
-   Expire-Date: 0
-   %no-protection
-   %commit
-   ```
-
-7. Generate key:
+6. Generate key:
    ```bash
    gpg --batch --generate-key ~/keygen.conf
    ```
 
-8. List keys:
+7. List keys:
    ```bash
    gpg --list-keys
    ```
 
-9. Copy key ID (example):
+8. Copy key ID (example):
    ```
    E5435GDSGIOSDF90345DSGOJSGD34DGSF
    ```
 
-10. Init pass repo:
+9. Init pass repo:
    ```bash
    /opt/bin/pass init paste_your_copied_string
    ```
 
-11. Insert password:
+10. Insert password:
    ```bash
    /opt/bin/pass insert repositories/borg/nas1
    ```
 
-12. Remove config:
+11. Remove config:
    ```bash
    rm -f ~/keygen.conf
    ```
 
-13. *(Optional)* Test:
+12. *(Optional)* Test:
    ```bash
    /opt/bin/pass show repositories/borg/nas1
    ```
